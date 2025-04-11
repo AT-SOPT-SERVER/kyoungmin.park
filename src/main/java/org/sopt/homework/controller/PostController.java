@@ -8,8 +8,6 @@ import org.sopt.homework.service.PostService;
 public class PostController {
 	private final PostService postService = new PostService();
 
-	private int postId;
-
 	// 파일로부터 게시글 데이터를 로딩
 	public void loadPosts() {
 		postService.loadPosts();
