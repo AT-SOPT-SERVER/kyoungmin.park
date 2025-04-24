@@ -26,6 +26,9 @@ public class PostService {
 	// 게시글 저장
 	@Transactional
 	public PostResponse createPost(PostRequest postRequestDto) {
+		// 검증 실패시에 쿼리문이 실행되지 않도록 엔티티 변환을 먼저 수행
+		Post newPost = postRequestDto.toEntity();
+
 		// 마지막으로 게시글이 작성된 시각 조회
 		LocalDateTime lastCreated = postRepository.findCurrentCreatedAt().orElse(LocalDateTime.now().minusMinutes(3L));
 
@@ -39,8 +42,7 @@ public class PostService {
 			throw new GlobalException(ExceptionMessage.EXIST_TITLE);
 		}
 
-		Post post = postRepository.save(postRequestDto.toEntity());
-		return PostResponse.of(post);
+		return PostResponse.of(postRepository.save(newPost));
 	}
 
 	// 게시글 전체 조회
