@@ -1,12 +1,8 @@
-package org.sopt.homework.exception.message;
+package org.sopt.homework.global.exception.message;
 
 import org.springframework.http.HttpStatus;
 
 public enum ExceptionMessage {
-
-	/*
-	 * 에러 메시지, 서브 코드
-	 */
 	EMPTY_TITLE(HttpStatus.BAD_REQUEST, "c4001", "제목이 비어있습니다."),
 	OVER_LENGTH_TITLE(HttpStatus.BAD_REQUEST, "c4002", "제목은 30글자를 넘을 수 없습니다."),
 	BAD_REQUEST(HttpStatus.BAD_REQUEST, "c4050", "잘못된 HTTP method 요청입니다."),
