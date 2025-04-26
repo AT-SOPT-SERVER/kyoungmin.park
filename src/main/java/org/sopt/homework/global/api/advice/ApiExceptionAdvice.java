@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ApiExceptionAdvice {
 	@ExceptionHandler(GlobalException.class)
-	public ResponseEntity<ErrorResponse> handleInvalidTitleException(GlobalException e) {
+	public ResponseEntity<ErrorResponse> handleGlobalException(GlobalException e) {
 		ExceptionMessage exceptionMessage = e.getExceptionMessage();
 
 		return ResponseEntity
@@ -20,7 +20,7 @@ public class ApiExceptionAdvice {
 
 	// 정의되지 않은 예외에 대해 500을 반환
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ErrorResponse> handleException(Exception e) {
+	public ResponseEntity<ErrorResponse> handleUndefinedException(Exception e) {
 		ExceptionMessage exceptionMessage = ExceptionMessage.INTERNAL_SERVER_ERROR;
 
 		return ResponseEntity
