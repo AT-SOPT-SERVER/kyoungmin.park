@@ -2,8 +2,10 @@ package org.sopt.homework.controller;
 
 import org.sopt.homework.dto.user.UserSignupRequest;
 import org.sopt.homework.service.UserService;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +20,11 @@ public class UserController {
 
 	@PostMapping("/signup")
 	public void create(@RequestBody final UserSignupRequest userSignupRequest) {
-		userService.createUser(userSignupRequest);//response로 아이디랑 이름 추가하기, 201로 바꾸기
+		userService.createUser(userSignupRequest);
+	}
+
+	@DeleteMapping
+	public void delete(@RequestHeader(name = "userId", required = true) final long userId) {
+		userService.deleteUser(userId);
 	}
 }
