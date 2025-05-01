@@ -97,8 +97,15 @@ public class PostService {
 
 	// 게시글 삭제
 	@Transactional
-	public void deletePostById(final long postId) {
-		postRepository.deleteById(postId);
+	public void deletePostById(final long userId, final long postId) {
+		Post post = postRepository.findById(postId)
+			.orElseThrow(() -> new GlobalException(ExceptionMessage.POST_NOT_FOUND));
+
+		if (post.getAuthor() == null || post.getAuthor().getId() != userId) {
+			throw new GlobalException(ExceptionMessage.INVALID_AUTHOR);
+		}
+
+		postRepository.deleteById(postId); // 유효한 사용자인지 검증 하는 로직 추가
 	}
 
 	// 유저 엔티티의 프록시 객체 생성

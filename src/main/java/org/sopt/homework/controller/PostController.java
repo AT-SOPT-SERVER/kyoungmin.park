@@ -29,7 +29,8 @@ public class PostController {
 	@PostMapping
 	public ResponseMessage createPost(
 		@RequestHeader(name = "userId", required = true) final long userId,
-		@RequestBody final PostWriteRequest postWriteRequestDto) {
+		@RequestBody final PostWriteRequest postWriteRequestDto
+	) {
 		postService.createPost(userId, postWriteRequestDto);
 		return ResponseMessage.POST_CREATED;
 	}
@@ -61,14 +62,18 @@ public class PostController {
 	public void updatePostTitle(
 		@RequestHeader(name = "userId", required = true) final long userId,
 		@PathVariable(value = "postId") final long postId,
-		@RequestBody final PostWriteRequest postWriteRequestDto) {
+		@RequestBody final PostWriteRequest postWriteRequestDto
+	) {
 		postService.updatePost(postId, userId, postWriteRequestDto);
 	}
 
 	// 게시글 삭제
 	@DeleteMapping(path = "/{postId}")
-	public ResponseMessage deletePostById(@PathVariable(value = "postId") final long postId) {
-		postService.deletePostById(postId);
+	public ResponseMessage deletePostById(
+		@RequestHeader(name = "userId", required = true) final long userId,
+		@PathVariable(value = "postId") final long postId
+	) {
+		postService.deletePostById(userId, postId);
 		return ResponseMessage.POST_DELETED;
 	}
 }
