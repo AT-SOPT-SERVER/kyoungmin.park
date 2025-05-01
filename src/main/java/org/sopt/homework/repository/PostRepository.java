@@ -20,13 +20,16 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
 	// 이미 존재하는 게시글 제목인지 판별
 	boolean existsByTitle(String title);
 
+	@Query("SELECT p FROM Post p LEFT JOIN p.author WHERE p.id = :postId")
+	Optional<Post> findById(@Param("postId") long postId);
+
 	// 게시글 전체 목록 최신순 조회
 	@Query("SELECT p FROM Post p LEFT JOIN p.author u ORDER BY p.createdAt DESC")
 	List<Post> findAllByOrderByCreatedAtDesc();
 
 	// 연관관계 제거 반영을 위한 벌크 연산
 	@Modifying
-	@Query("UPDATE Post p SET p.author = null where p.author.id = :userId")
+	@Query("UPDATE Post p SET p.author = NULL WHERE p.author.id = :userId")
 	void removeAuthor(@Param("userId") long userId);
 
 	// 검색 조건에 따라 검색, 키원드가 전부 null이거나 빈 문자열이면 전체 리스트를 반환
