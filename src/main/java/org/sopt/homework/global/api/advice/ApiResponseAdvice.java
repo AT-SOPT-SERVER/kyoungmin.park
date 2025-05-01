@@ -1,11 +1,9 @@
 package org.sopt.homework.global.api.advice;
 
-import org.sopt.homework.dto.PostResponse;
 import org.sopt.homework.global.api.message.ResponseMessage;
 import org.sopt.homework.global.api.response.ErrorResponse;
 import org.sopt.homework.global.api.response.SuccessfulResponse;
 import org.springframework.core.MethodParameter;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
@@ -31,16 +29,15 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
 			return body;
 		}
 
-		// 삭제 요청에 대한 응답 상태 코드 설정
-		if (request.getMethod().equals(HttpMethod.DELETE)) {
-			response.setStatusCode(ResponseMessage.DELETED.getHttpStatus());
-			return SuccessfulResponse.of(ResponseMessage.DELETED, body);
+		// 이미 응답 형태로 감싸진 경우 바로 body를 반환
+		if (body instanceof SuccessfulResponse) {
+			return body;
 		}
 
-		// 생성 요청에 대한 응답 상태 코드 설정
-		if (request.getMethod().equals(HttpMethod.POST) && returnType.getParameterType().equals(PostResponse.class)) {
-			response.setStatusCode(ResponseMessage.CREATED.getHttpStatus());
-			return SuccessfulResponse.of(ResponseMessage.CREATED, body);
+		// 반환 형태가 ResponseMessage인 경우 해당되는 응답 코드 적용 및 형태 적용
+		if (body instanceof ResponseMessage responseMessage) {
+			response.setStatusCode(responseMessage.getHttpStatus());
+			return SuccessfulResponse.of(responseMessage, null);
 		}
 
 		return SuccessfulResponse.of(ResponseMessage.SUCCESS, body);
