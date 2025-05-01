@@ -7,12 +7,11 @@ import java.util.Optional;
 import org.sopt.homework.domain.Post;
 import org.sopt.homework.domain.util.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificationExecutor<Post> {
+public interface PostRepository extends JpaRepository<Post, Long> {
 	// 가장 최근에 작성된 게시글의 작성 시각 조회
 	@Query("SELECT MAX(p.createdAt) FROM Post p")
 	Optional<LocalDateTime> findCurrentCreatedAt();
