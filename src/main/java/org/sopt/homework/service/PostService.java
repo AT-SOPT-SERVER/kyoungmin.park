@@ -2,15 +2,17 @@ package org.sopt.homework.service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.sopt.homework.domain.Post;
-import org.sopt.homework.dto.PostRequest;
-import org.sopt.homework.dto.PostResponse;
+import org.sopt.homework.domain.User;
+import org.sopt.homework.domain.util.Tag;
+import org.sopt.homework.dto.post.request.PostWriteRequest;
+import org.sopt.homework.dto.post.response.PostDetailResponse;
+import org.sopt.homework.dto.post.response.PostListResponse;
 import org.sopt.homework.global.exception.GlobalException;
 import org.sopt.homework.global.exception.message.ExceptionMessage;
 import org.sopt.homework.repository.PostRepository;
+import org.sopt.homework.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,75 +20,92 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class PostService {
 	private final PostRepository postRepository;
+	private final UserRepository userRepository;
 
-	public PostService(PostRepository postRepository) {
+	public PostService(PostRepository postRepository, UserRepository userRepository) {
 		this.postRepository = postRepository;
+		this.userRepository = userRepository;
 	}
 
 	// 게시글 저장
 	@Transactional
-	public PostResponse createPost(PostRequest postRequestDto) {
+	public void createPost(final long userId, final PostWriteRequest postWriteRequestDto) {
 		// 검증 실패시에 쿼리문이 실행되지 않도록 엔티티 변환을 먼저 수행
-		Post newPost = postRequestDto.toEntity();
+		Post newPost = postWriteRequestDto.toEntity(getUserProxy(userId));
 
 		// 마지막으로 게시글이 작성된 시각 조회
 		LocalDateTime lastCreated = postRepository.findCurrentCreatedAt().orElse(LocalDateTime.now().minusMinutes(3L));
 
 		// 마지막 작성 시각과의 차이가 3분 이내라면 예외 발생
-		if (Duration.between(lastCreated, LocalDateTime.now()).toMinutes() < 1) {
+		if (Duration.between(lastCreated, LocalDateTime.now()).toMinutes() < 3) {
 			throw new GlobalException(ExceptionMessage.CREATION_TIME_LIMIT);
 		}
 
 		// 요청에 포함된 제목이 이미 존재한다면 예외 발생
-		if (postRepository.existsByTitle(postRequestDto.title())) {
+		if (postRepository.existsByTitle(postWriteRequestDto.title())) {
 			throw new GlobalException(ExceptionMessage.EXIST_TITLE);
 		}
 
-		return PostResponse.of(postRepository.save(newPost));
+		postRepository.save(newPost);
 	}
 
 	// 게시글 전체 조회
-	public List<PostResponse> getAllPosts() {
+	public PostListResponse getAllPosts() {
 		// 결과가 존재하지 않으면 빈 리스트 반환
-		return postRepository.findAll().stream().map(PostResponse::of).toList();
+		return PostListResponse.of(postRepository.findAllByOrderByCreatedAtDesc());
 	}
 
-	// 키워드로 게시글 검색
-	public List<PostResponse> getPostsByTitle(String keyword) {
-		// 결과가 존재하지 않으면 검색 쿼리를 날리지 않고 빈 리스트 반환
-		if (keyword.isBlank()) {
-			return new ArrayList<>();
+	public PostListResponse searchPosts(final String author, final String title, final String tagName) {
+		Tag tag = null;
+
+		if (tagName != null) {
+			tag = Tag.fromString(tagName);
 		}
 
-		return postRepository.findByTitleContaining(keyword).stream().map(PostResponse::of).toList();
+		return PostListResponse.of(
+			postRepository.findByOptionsOrderByCreatedAtDesc(author, title, tag));
 	}
 
 	// 게시글 상세 조회
-	public PostResponse getPostById(Long id) {
+	public PostDetailResponse getPostById(final long postId) {
 		// id에 해당하는 게시글이 존재하지 않으면 예외 발생
-		Post post = postRepository.findById(id)
+		Post post = postRepository.findById(postId)
 			.orElseThrow(() -> new GlobalException(ExceptionMessage.POST_NOT_FOUND));
-		return PostResponse.of(post);
+		return PostDetailResponse.of(post);
 	}
 
-	// 게시글 제목 수정
+	// 게시글 수정
 	@Transactional
-	public void updatePost(Long id, PostRequest postRequestDto) {
+	public void updatePost(final long postId, final long userId, final PostWriteRequest postWriteRequestDto) {
 		// 제목 수정 시 요청에 포함된 제목이 이미 존재한다면 예외 발생
-		if (postRepository.existsByTitle(postRequestDto.title())) {
+		if (postRepository.existsByTitle(postWriteRequestDto.title())) {
 			throw new GlobalException(ExceptionMessage.EXIST_TITLE);
 		}
 
 		// id에 해당하는 게시글이 존재하지 않으면 예외 발생
-		Post post = postRepository.findById(id)
+		Post post = postRepository.findById(postId)
 			.orElseThrow(() -> new GlobalException(ExceptionMessage.POST_NOT_FOUND));
 
-		post.updateTitle(postRequestDto.title());
+		if (post.getAuthor().getId() != userId) {
+			throw new GlobalException(ExceptionMessage.INVALID_AUTHOR);
+		}
+
+		post.updateTitle(postWriteRequestDto.title());
+		post.updateContent(postWriteRequestDto.content());
+		post.updateTag(postWriteRequestDto.tagName());
 	}
 
 	// 게시글 삭제
 	@Transactional
-	public void deletePostById(Long id) {
-		postRepository.deleteById(id);
+	public void deletePostById(final long postId) {
+		postRepository.deleteById(postId);
+	}
+
+	// 유저 엔티티의 프록시 객체 생성
+	private User getUserProxy(final long userId) {
+		if (!userRepository.existsById(userId)) {
+			throw new GlobalException(ExceptionMessage.USER_NOT_FOUND);
+		}
+		return userRepository.getReferenceById(userId);
 	}
 }
