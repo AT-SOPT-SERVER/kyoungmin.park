@@ -18,12 +18,12 @@ public class UserService {
 	}
 
 	@Transactional
-	public void createUser(UserSignupRequest userSignupRequest) {
+	public void createUser(final UserSignupRequest userSignupRequest) {
 		userRepository.save(userSignupRequest.toEntity());
 	}
 
 	@Transactional
-	public void deleteUser(long userId) {
+	public void deleteUser(final long userId) {
 		// 게시글과 유저의 연관관계 먼저 제거
 		postRepository.removeAuthor(userId);
 
