@@ -25,10 +25,10 @@ dependencies {
     // jpa
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    // database-h2
-    runtimeOnly 'com.h2database:h2'
+    // database-mysql
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
-    //test-junit
+    // test-junit
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
