@@ -2,6 +2,11 @@ package org.sopt.homework.global.api.message;
 
 import org.springframework.http.HttpStatus;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum ResponseMessage {
 	SUCCESS(HttpStatus.OK, "s2000", "요청이 성공했습니다."),
 	POST_CREATED(HttpStatus.CREATED, "s2010", "게시글이 생성되었습니다."),
@@ -13,22 +18,4 @@ public enum ResponseMessage {
 	private final HttpStatus httpStatus;
 	private final String subCode;
 	private final String message;
-
-	ResponseMessage(HttpStatus httpStatus, String subCode, String message) {
-		this.httpStatus = httpStatus;
-		this.subCode = subCode;
-		this.message = message;
-	}
-
-	public HttpStatus getHttpStatus() {
-		return this.httpStatus;
-	}
-
-	public String getSubCode() {
-		return this.subCode;
-	}
-
-	public String getMessage() {
-		return this.message;
-	}
 }

@@ -20,9 +20,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @Table(name = "post")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public final class Post {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,29 +64,6 @@ public final class Post {
 		this.content = content;
 		this.tag = Tag.fromString(tagName);
 		this.author = author;
-	}
-
-	protected Post() {
-	}
-
-	public long getId() {
-		return this.id;
-	}
-
-	public String getTitle() {
-		return this.title;
-	}
-
-	public String getContent() {
-		return this.content;
-	}
-
-	public Tag getTag() {
-		return this.tag;
-	}
-
-	public User getAuthor() {
-		return this.author;
 	}
 
 	// 게시글 제목 수정

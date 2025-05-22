@@ -2,6 +2,11 @@ package org.sopt.homework.global.exception.message;
 
 import org.springframework.http.HttpStatus;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum ExceptionMessage {
 	EMPTY_TITLE(HttpStatus.BAD_REQUEST, "c4001", "제목이 비어있습니다."),
 	OVER_LENGTH_TITLE(HttpStatus.BAD_REQUEST, "c4002", "제목은 30글자를 넘을 수 없습니다."),
@@ -19,22 +24,4 @@ public enum ExceptionMessage {
 	private final HttpStatus httpStatus;
 	private final String subCode;
 	private final String message;
-
-	ExceptionMessage(HttpStatus httpStatus, String subCode, String message) {
-		this.httpStatus = httpStatus;
-		this.subCode = subCode;
-		this.message = message;
-	}
-
-	public HttpStatus getHttpStatus() {
-		return this.httpStatus;
-	}
-
-	public String getSubCode() {
-		return this.subCode;
-	}
-
-	public String getMessage() {
-		return this.message;
-	}
 }

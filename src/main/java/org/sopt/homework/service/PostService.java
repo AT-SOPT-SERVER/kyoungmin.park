@@ -16,16 +16,14 @@ import org.sopt.homework.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class PostService {
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
-
-	public PostService(PostRepository postRepository, UserRepository userRepository) {
-		this.postRepository = postRepository;
-		this.userRepository = userRepository;
-	}
 
 	// 게시글 저장
 	@Transactional

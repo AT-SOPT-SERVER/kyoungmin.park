@@ -16,14 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/posts")
+@RequiredArgsConstructor
 public class PostController {
 	private final PostService postService;
-
-	public PostController(PostService postService) {
-		this.postService = postService;
-	}
 
 	// 게시글 생성
 	@PostMapping
