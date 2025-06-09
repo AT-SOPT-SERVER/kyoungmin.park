@@ -9,10 +9,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ExceptionMessage {
 	EMPTY_TITLE(HttpStatus.BAD_REQUEST, "c4001", "제목이 비어있습니다."),
-	OVER_LENGTH_TITLE(HttpStatus.BAD_REQUEST, "c4002", "제목은 30글자를 넘을 수 없습니다."),
-	INVALID_TAG_NAME(HttpStatus.BAD_REQUEST, "c4003", "잘못된 태그명입니다."),
-	EMPTY_NAME(HttpStatus.BAD_REQUEST, "c4004", "이름이 비어있습니다."),
-	OVER_LENGTH_NAME(HttpStatus.BAD_REQUEST, "c4005", "이름은 10글자를 넘을 수 없습니다."),
+	EMPTY_CONTENT(HttpStatus.BAD_REQUEST, "c4002", "본문이 비어있습니다."),
+	OVER_LENGTH_POST_TITLE(HttpStatus.BAD_REQUEST, "c4003", "게시글 제목은 30자를 넘을 수 없습니다."),
+	OVER_LENGTH_POST_CONTENT(HttpStatus.BAD_REQUEST, "c4004", "게시글 본문은 1000자를 넘을 수 없습니다."),
+	INVALID_TAG_NAME(HttpStatus.BAD_REQUEST, "c4005", "잘못된 태그명입니다."),
+	EMPTY_NAME(HttpStatus.BAD_REQUEST, "c4006", "이름이 비어있습니다."),
+	OVER_LENGTH_NAME(HttpStatus.BAD_REQUEST, "c4007", "이름은 10글자를 넘을 수 없습니다."),
+	EMPTY_COMMENT(HttpStatus.BAD_REQUEST, "c4008", "댓글이 비어있습니다."),
+	OVER_LENGTH_COMMENT_CONTENT(HttpStatus.BAD_REQUEST, "c4009", "댓글은 300자를 넘을 수 없습니다."),
 	INVALID_AUTHOR(HttpStatus.FORBIDDEN, "c4030", "수정할 수 있는 권한이 없습니다."),
 	BAD_REQUEST(HttpStatus.METHOD_NOT_ALLOWED, "c4050", "잘못된 HTTP method 요청입니다."),
 	EXIST_TITLE(HttpStatus.CONFLICT, "c4090", "이미 존재하는 게시글입니다."),
@@ -24,6 +28,7 @@ public enum ExceptionMessage {
 	LOGIN_FAIL(HttpStatus.UNAUTHORIZED, "c4010", "로그인 실패"),
 	WRONG_LOGIN_ID(HttpStatus.UNAUTHORIZED, "c4011", "존재하지 않는 아이디입니다."),
 	WRONG_PASSWORD(HttpStatus.UNAUTHORIZED, "c4012", "비밀번호가 일치하지 않습니다."),
+	INVALID_TOKEN(HttpStatus.NOT_ACCEPTABLE, "c4060", "유효하지 않은 토큰입니다."),
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "s5000", "서버 내부 오류입니다.");
 
 	private final HttpStatus httpStatus;

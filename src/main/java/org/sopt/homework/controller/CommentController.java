@@ -27,27 +27,28 @@ public class CommentController {
 	@PostMapping(path = "/posts/{postId}/comments")
 	public ResponseMessage createComment(
 			@AuthenticationPrincipal final UUID userId,
-			@PathVariable(value = "postId") final UUID postId,
+			@PathVariable(name = "postId") final UUID postId,
 			@RequestBody final CommentWriteRequest commentWriteRequest
 	) {
-		commentService.createComment(userId, postId, commentWriteRequest);
-		return ResponseMessage.COMMENT_CREATED;
+		return commentService.createComment(userId, postId, commentWriteRequest);
 	}
 
 	// 특정 게시물에 대한 댓글 조회
 	@GetMapping(path = "/posts/{postId}/comments")
-	public List<CommentDetailResponse> getComments(@PathVariable(value = "postId") final UUID postId) {
-		return commentService.getComments(postId);
+	public List<CommentDetailResponse> getComments(
+			@AuthenticationPrincipal final UUID userId,
+			@PathVariable(name = "postId") final UUID postId) {
+		return commentService.getComments(userId, postId);
 	}
 
 	// 댓글 수정
 	@PutMapping(path = "/comments/{commentId}")
 	public ResponseMessage updateComment(
 			@AuthenticationPrincipal final UUID userId,
-			@PathVariable(value = "commentId") final UUID commentId,
+			@PathVariable(name = "commentId") final UUID commentId,
 			@RequestBody final CommentWriteRequest commentWriteRequest) {
-		commentService.updateComment(userId, commentId, commentWriteRequest);
-		return ResponseMessage.SUCCESS;
+		return commentService.updateComment(userId, commentId, commentWriteRequest);
+
 	}
 
 	// 댓글 삭제
@@ -56,7 +57,14 @@ public class CommentController {
 			@AuthenticationPrincipal final UUID userId,
 			@PathVariable(name = "commentId") final UUID commentId
 	) {
-		commentService.deleteComment(userId, commentId);
-		return ResponseMessage.COMMENT_DELETED;
+		return commentService.deleteComment(userId, commentId);
+	}
+
+	@PostMapping(path = "/comments/{commentId}/like")
+	public ResponseMessage likeComment(
+			@AuthenticationPrincipal UUID userId,
+			@PathVariable(name = "commentId") UUID commentId
+	) {
+		return commentService.likeComment(userId, commentId);
 	}
 }

@@ -2,6 +2,10 @@ package org.sopt.homework.domain;
 
 import java.util.UUID;
 
+import org.sopt.homework.domain.util.validator.Validator;
+import org.sopt.homework.global.exception.GlobalException;
+import org.sopt.homework.global.exception.message.ExceptionMessage;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -39,6 +43,7 @@ public final class Comment extends BaseEntity {
 
 	@Builder
 	private Comment(String content, User user, Post post) {
+		validateContent(content);
 		this.id = UUID.randomUUID();
 		this.content = content;
 		this.user = user;
@@ -47,5 +52,25 @@ public final class Comment extends BaseEntity {
 
 	public void updateComment(String content) {
 		this.content = content;
+	}
+
+	public void incrementLikeCount() {
+		this.likeCount++;
+	}
+
+	public void decrementLikeCount() {
+		this.likeCount--;
+	}
+
+	private void validateContent(String content) {
+		if (content == null) {
+			throw new GlobalException(ExceptionMessage.BAD_REQUEST);
+		}
+		if (Validator.isEmpty(content)) {
+			throw new GlobalException(ExceptionMessage.EMPTY_TITLE);
+		}
+		if (Validator.isOverLength(content, 300)) {
+			throw new GlobalException((ExceptionMessage.OVER_LENGTH_COMMENT_CONTENT));
+		}
 	}
 }

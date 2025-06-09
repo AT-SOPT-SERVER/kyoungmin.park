@@ -7,10 +7,10 @@ import org.sopt.homework.domain.Comment;
 import org.sopt.homework.domain.User;
 
 public record CommentDetailResponse(Author author, CommentInfo comment) {
-	public static CommentDetailResponse from(Comment comment) {
+	public static CommentDetailResponse of(Comment comment, boolean isLiked) {
 		return new CommentDetailResponse(
 				Author.of(comment.getUser()),
-				CommentInfo.of(comment));
+				CommentInfo.of(comment, isLiked));
 	}
 
 	private record Author(UUID id, String name) {
@@ -19,9 +19,10 @@ public record CommentDetailResponse(Author author, CommentInfo comment) {
 		}
 	}
 
-	private record CommentInfo(UUID id, String content, LocalDateTime createdAt) {
-		private static CommentInfo of(Comment comment) {
-			return new CommentInfo(comment.getId(), comment.getContent(), comment.getCreatedAt());
+	private record CommentInfo(UUID id, String content, int likeCount, boolean isLiked, LocalDateTime createdAt) {
+		private static CommentInfo of(Comment comment, boolean isLiked) {
+			return new CommentInfo(comment.getId(), comment.getContent(), comment.getLikeCount(), isLiked,
+					comment.getCreatedAt());
 		}
 	}
 }
