@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import org.sopt.homework.global.api.response.ErrorResponse;
+import org.sopt.homework.global.exception.message.ExceptionMessage;
 import org.sopt.homework.global.security.util.constant.WhiteList;
 import org.sopt.homework.global.security.util.jwt.JwtParser;
 import org.sopt.homework.global.security.util.jwt.JwtValidator;
@@ -32,16 +34,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 			FilterChain filterChain) throws ServletException, IOException {
 
-		// 접근이 허용된 경로에 대한 요청이 발생하면 jwt검증을 건너뛰고 다음 필터로 넘김
-		if (WhiteList.isPermitted(request.getRequestURI(), HttpMethod.valueOf(request.getMethod()))) {
+		String accessTokenWithBearer = request.getHeader("Authorization");
+
+		// 접근이 허용된 경로에 대한 요청이 발생, 토큰이 없으면 jwt검증을 건너뛰고 다음 필터로 넘김
+		if (WhiteList.isPermitted(request.getRequestURI(), HttpMethod.valueOf(request.getMethod()))
+				&& accessTokenWithBearer == null) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 
-		String accessTokenWithBearer = request.getHeader("Authorization");
-
 		if (!jwtValidator.isValid(accessTokenWithBearer)) {
-			jsonResponseWriter.writeJsonResponse(response, 406, "Bearer token is invalid");
+			jsonResponseWriter.writeJsonResponse(response, 406, ErrorResponse.of(ExceptionMessage.INVALID_TOKEN));
 			return;
 		}
 

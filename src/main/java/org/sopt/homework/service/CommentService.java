@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.sopt.homework.domain.Comment;
 import org.sopt.homework.domain.commentUserLike.CommentUserLike;
 import org.sopt.homework.dto.comment.request.CommentWriteRequest;
-import org.sopt.homework.dto.comment.response.CommentDetailResponse;
+import org.sopt.homework.dto.comment.response.CommentListResponse;
 import org.sopt.homework.global.api.message.ResponseMessage;
 import org.sopt.homework.global.exception.GlobalException;
 import org.sopt.homework.global.exception.message.ExceptionMessage;
@@ -15,6 +15,9 @@ import org.sopt.homework.repository.CommentRepository;
 import org.sopt.homework.repository.CommentUserLikeRepository;
 import org.sopt.homework.repository.PostRepository;
 import org.sopt.homework.repository.UserRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CommentService {
+	private static final int PAGE_SIZE = 10;
 	private final UserRepository userRepository;
 	private final PostRepository postRepository;
 	private final CommentRepository commentRepository;
@@ -48,20 +52,20 @@ public class CommentService {
 		return ResponseMessage.COMMENT_CREATED;
 	}
 
-	public List<CommentDetailResponse> getComments(final UUID userId, final UUID postId) {
-		List<Comment> comments = commentRepository.findAllByPostId(postId);
+	public CommentListResponse getComments(final UUID userId, final UUID postId, int page) {
+		validatePage(page);
+		Pageable pageable = PageRequest.of(--page, PAGE_SIZE);
+		Slice<Comment> comments = commentRepository.findAllByPostId(postId, pageable);
 
 		// 모든 댓글 ID 추출
-		List<UUID> commentIds = comments.stream()
+		List<UUID> commentIds = comments.getContent()
+				.stream()
 				.map(Comment::getId)
 				.toList();
-
-		// 좋아요 누른 댓글 ID 목록 조회 (단 1번 쿼리)
+		// 좋아요 누른 댓글 ID 목록 조회
 		Set<UUID> likedCommentIds = commentUserLikeRepository.findCommentIdsUserLiked(userId, commentIds);
-		
-		return comments.stream()
-				.map(comment -> CommentDetailResponse.of(comment, likedCommentIds.contains(comment.getId())))
-				.toList();
+
+		return CommentListResponse.of(comments, likedCommentIds);
 	}
 
 	@Transactional
@@ -118,5 +122,11 @@ public class CommentService {
 		commentUserLikeRepository.save(commentUserLike);
 		comment.incrementLikeCount();
 		return ResponseMessage.SUCCESS;
+	}
+
+	private void validatePage(final int page) {
+		if (page < 1) {
+			throw new GlobalException(ExceptionMessage.WRONG_PAGE_INDEX);
+		}
 	}
 }

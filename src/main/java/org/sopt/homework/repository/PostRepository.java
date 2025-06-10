@@ -1,12 +1,13 @@
 package org.sopt.homework.repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.sopt.homework.domain.Post;
 import org.sopt.homework.domain.util.post.Tag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
@@ -21,7 +22,7 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 	Optional<LocalDateTime> findCurrentCreatedAt();
 
 	// 아이디를 통해 존재하는 게시글인지 판별
-	boolean existsById(UUID id);
+	boolean existsById(UUID postId);
 
 	// 이미 존재하는 게시글 제목인지 판별
 	boolean existsByTitle(String title);
@@ -37,7 +38,7 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 
 	// 게시글 전체 목록 최신순 조회
 	@Query("SELECT p FROM Post p LEFT JOIN FETCH p.user u ORDER BY p.createdAt DESC")
-	List<Post> findAllByOrderByCreatedAtDesc();
+	Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
 	// 연관관계 제거 반영을 위한 벌크 연산
 	@Modifying
@@ -53,8 +54,9 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 			    AND (:tag IS NULL OR p.tag = :tag)
 			    ORDER BY p.createdAt DESC
 			""")
-	List<Post> findByOptionsOrderByCreatedAtDesc(
+	Page<Post> findByOptionsOrderByCreatedAtDesc(
 			@Param("user") String user,
 			@Param("title") String title,
-			@Param("tag") Tag tag);
+			@Param("tag") Tag tag,
+			Pageable pageable);
 }

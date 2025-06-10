@@ -14,10 +14,10 @@ public enum WhiteList {
 	SIGNUP("/users/signup", HttpMethod.POST),
 	LOGIN("/users/login", HttpMethod.POST),
 	REISSUE("/users/reissue", HttpMethod.POST),
-	READ_ALL_POSTS("/posts", HttpMethod.GET),
-	READ_POST_DETAIL("/posts/**", HttpMethod.GET),
-	SEARCH_POSTS("/posts/search", HttpMethod.GET),
-	READ_COMMENTS("/posts/**/comments", HttpMethod.GET);
+	READ_ALL_POSTS("/posts/**", HttpMethod.GET),
+	READ_POST_DETAIL("/posts/detail/**", HttpMethod.GET),
+	SEARCH_POSTS("/posts/search/**", HttpMethod.GET),
+	READ_COMMENTS("/posts/**/comments/**", HttpMethod.GET);
 
 	private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 	private final String path;

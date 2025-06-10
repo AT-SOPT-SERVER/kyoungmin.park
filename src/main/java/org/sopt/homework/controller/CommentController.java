@@ -1,10 +1,9 @@
 package org.sopt.homework.controller;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.sopt.homework.dto.comment.request.CommentWriteRequest;
-import org.sopt.homework.dto.comment.response.CommentDetailResponse;
+import org.sopt.homework.dto.comment.response.CommentListResponse;
 import org.sopt.homework.global.api.message.ResponseMessage;
 import org.sopt.homework.service.CommentService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,11 +33,12 @@ public class CommentController {
 	}
 
 	// 특정 게시물에 대한 댓글 조회
-	@GetMapping(path = "/posts/{postId}/comments")
-	public List<CommentDetailResponse> getComments(
+	@GetMapping(path = "/posts/{postId}/comments/{page}")
+	public CommentListResponse getComments(
 			@AuthenticationPrincipal final UUID userId,
-			@PathVariable(name = "postId") final UUID postId) {
-		return commentService.getComments(userId, postId);
+			@PathVariable(name = "postId") final UUID postId,
+			@PathVariable(name = "page") final int page) {
+		return commentService.getComments(userId, postId, page);
 	}
 
 	// 댓글 수정

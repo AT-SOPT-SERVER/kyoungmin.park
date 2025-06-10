@@ -16,6 +16,7 @@ public enum ExceptionMessage {
 	EMPTY_NAME(HttpStatus.BAD_REQUEST, "c4006", "이름이 비어있습니다."),
 	OVER_LENGTH_NAME(HttpStatus.BAD_REQUEST, "c4007", "이름은 10글자를 넘을 수 없습니다."),
 	EMPTY_COMMENT(HttpStatus.BAD_REQUEST, "c4008", "댓글이 비어있습니다."),
+	WRONG_PAGE_INDEX(HttpStatus.BAD_REQUEST, "c4009", "잘못된 페이지 요청입니다."),
 	OVER_LENGTH_COMMENT_CONTENT(HttpStatus.BAD_REQUEST, "c4009", "댓글은 300자를 넘을 수 없습니다."),
 	INVALID_AUTHOR(HttpStatus.FORBIDDEN, "c4030", "수정할 수 있는 권한이 없습니다."),
 	BAD_REQUEST(HttpStatus.METHOD_NOT_ALLOWED, "c4050", "잘못된 HTTP method 요청입니다."),

@@ -18,6 +18,8 @@ import org.sopt.homework.repository.CommentRepository;
 import org.sopt.homework.repository.PostRepository;
 import org.sopt.homework.repository.PostUserLikeRepository;
 import org.sopt.homework.repository.UserRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PostService {
+	private static final int PAGE_SIZE = 10;
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
 	private final CommentRepository commentRepository;
@@ -57,13 +60,19 @@ public class PostService {
 	}
 
 	// 게시글 전체 조회
-	public PostListResponse getAllPosts() {
+	public PostListResponse getAllPosts(int page) {
+		validatePage(page);
+		// 0번 페이지를 1번으로 인덱스 일치시키기
+		Pageable pageable = PageRequest.of(--page, PAGE_SIZE);
 		// 결과가 존재하지 않으면 빈 리스트 반환
-		return PostListResponse.of(postRepository.findAllByOrderByCreatedAtDesc());
+		return PostListResponse.of(postRepository.findAllByOrderByCreatedAtDesc(pageable));
 	}
 
 	// 게시글 검색
-	public PostListResponse searchPosts(final String user, final String title, final String tagName) {
+	public PostListResponse searchPosts(final String user, final String title, final String tagName, int page) {
+		validatePage(page);
+		// 0번 페이지를 1번으로 인덱스 일치시키기
+		Pageable pageable = PageRequest.of(--page, PAGE_SIZE);
 		Tag tag = null;
 
 		if (tagName != null) {
@@ -71,7 +80,7 @@ public class PostService {
 		}
 
 		return PostListResponse.of(
-				postRepository.findByOptionsOrderByCreatedAtDesc(user, title, tag));
+				postRepository.findByOptionsOrderByCreatedAtDesc(user, title, tag, pageable));
 	}
 
 	// 게시글 상세 조회
@@ -152,5 +161,12 @@ public class PostService {
 	private User getAuthor(final UUID userId) {
 		return userRepository.findById(userId)
 				.orElseThrow(() -> new GlobalException(ExceptionMessage.USER_NOT_FOUND));
+	}
+
+	// 페이지가 올바른 인덱스인지 검사
+	private void validatePage(final int page) {
+		if (page < 1) {
+			throw new GlobalException(ExceptionMessage.WRONG_PAGE_INDEX);
+		}
 	}
 }

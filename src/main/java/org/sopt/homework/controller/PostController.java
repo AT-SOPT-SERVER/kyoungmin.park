@@ -36,23 +36,24 @@ public class PostController {
 	}
 
 	// 게시글 조회
-	@GetMapping
-	public PostListResponse getPosts() {
-		return postService.getAllPosts();
+	@GetMapping(path = "/{page}")
+	public PostListResponse getPosts(@PathVariable(name = "page") final int page) {
+		return postService.getAllPosts(page);
 	}
 
 	// 게시글 검색
-	@GetMapping(path = "/search")
+	@GetMapping(path = "/search/{page}")
 	public PostListResponse searchPosts(
 			@RequestParam(name = "author", required = false) final String author,
 			@RequestParam(name = "title", required = false) final String title,
-			@RequestParam(name = "tag", required = false) final String tagName
+			@RequestParam(name = "tag", required = false) final String tagName,
+			@PathVariable(name = "page", required = true) final int page
 	) {
-		return postService.searchPosts(author, title, tagName);
+		return postService.searchPosts(author, title, tagName, page);
 	}
 
 	// 게시글 상세 조회
-	@GetMapping(path = "/{postId}")
+	@GetMapping(path = "/detail/{postId}")
 	public PostDetailResponse getPostById(
 			@AuthenticationPrincipal final UUID userId,
 			@PathVariable(name = "postId") final UUID postId) {
@@ -76,7 +77,6 @@ public class PostController {
 			@PathVariable(name = "postId") final UUID postId
 	) {
 		return postService.deletePostById(userId, postId);
-
 	}
 
 	@PostMapping(path = "/{postId}/like")
