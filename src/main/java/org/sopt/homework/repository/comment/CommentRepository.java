@@ -1,4 +1,4 @@
-package org.sopt.homework.repository;
+package org.sopt.homework.repository.comment;
 
 import java.util.Optional;
 import java.util.UUID;

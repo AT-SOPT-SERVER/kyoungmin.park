@@ -1,4 +1,4 @@
-package org.sopt.homework.repository;
+package org.sopt.homework.repository.commentLikeUser;
 
 import java.util.List;
 import java.util.Set;

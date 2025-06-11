@@ -1,4 +1,4 @@
-package org.sopt.homework.repository;
+package org.sopt.homework.repository.postLikeUser;
 
 import java.util.UUID;
 

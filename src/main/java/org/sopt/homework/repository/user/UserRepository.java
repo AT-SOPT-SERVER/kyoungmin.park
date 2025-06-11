@@ -1,4 +1,4 @@
-package org.sopt.homework.repository;
+package org.sopt.homework.repository.user;
 
 import java.util.Optional;
 import java.util.UUID;
