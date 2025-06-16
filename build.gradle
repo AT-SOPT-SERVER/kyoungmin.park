@@ -47,6 +47,9 @@ dependencies {
     // database-mysql
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
     // test-junit
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
