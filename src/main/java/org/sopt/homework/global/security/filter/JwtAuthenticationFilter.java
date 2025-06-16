@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.sopt.homework.global.api.response.ErrorResponse;
+import org.sopt.homework.global.common.util.RedisUtil;
 import org.sopt.homework.global.exception.message.ExceptionMessage;
 import org.sopt.homework.global.security.util.constant.WhiteList;
 import org.sopt.homework.global.security.util.jwt.JwtParser;
@@ -29,6 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final JwtParser jwtParser;
 	private final JwtValidator jwtValidator;
 	private final JsonResponseWriter jsonResponseWriter;
+	private final RedisUtil redisUtil;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -36,19 +38,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		String accessTokenWithBearer = request.getHeader("Authorization");
 
-		// 접근이 허용된 경로에 대한 요청이 발생, 토큰이 없으면 jwt검증을 건너뛰고 다음 필터로 넘김
+		// 접근이 허용된 경로에 대한 요청이 발생하면, 토큰이 없어도 jwt검증을 건너뛰고 다음 필터로 넘겨서 요청 허용
+		// 토큰이 있는 경우에는 SecurityContext에 사용자 정보를 등록
 		if (WhiteList.isPermitted(request.getRequestURI(), HttpMethod.valueOf(request.getMethod()))
 				&& accessTokenWithBearer == null) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 
+		// access 토큰이 유효하지 않으면 예외처리
 		if (!jwtValidator.isValid(accessTokenWithBearer)) {
-			jsonResponseWriter.writeJsonResponse(response, 406, ErrorResponse.of(ExceptionMessage.INVALID_TOKEN));
+			jsonResponseWriter.writeJsonResponse(response, 406,
+					ErrorResponse.of(ExceptionMessage.INVALID_TOKEN));
 			return;
 		}
 
-		String accessToken = accessTokenWithBearer.split(" ")[1];
+		// 토큰이 블랙리스트에 존재하면 예외처리
+		if (redisUtil.searchTokenOnBlackList(accessTokenWithBearer).isPresent()) {
+			jsonResponseWriter.writeJsonResponse(response, 406,
+					ErrorResponse.of(ExceptionMessage.INVALID_TOKEN));
+			return;
+		}
+
+		String accessToken = accessTokenWithBearer.substring(7);
 
 		registerAuthentication(accessToken);
 

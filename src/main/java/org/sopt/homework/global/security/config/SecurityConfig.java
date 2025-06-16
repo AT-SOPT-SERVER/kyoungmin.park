@@ -1,5 +1,6 @@
 package org.sopt.homework.global.security.config;
 
+import org.sopt.homework.global.common.util.RedisUtil;
 import org.sopt.homework.global.security.filter.JwtAuthenticationFilter;
 import org.sopt.homework.global.security.util.jwt.JwtParser;
 import org.sopt.homework.global.security.util.jwt.JwtValidator;
@@ -23,6 +24,7 @@ public class SecurityConfig {
 	private final JwtValidator jwtValidator;
 	private final JwtParser jwtParser;
 	private final JsonResponseWriter jsonResponseWriter;
+	private final RedisUtil redisUtil;
 
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
@@ -32,7 +34,7 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtParser, jwtValidator,
-				jsonResponseWriter);
+				jsonResponseWriter, redisUtil);
 
 		return http.csrf(AbstractHttpConfigurer::disable)        // jwt 사용을 위해 csrf 토큰 사용 비활성화
 				.formLogin(AbstractHttpConfigurer::disable)        // api 로그인을 위해 기본 제공 form 로그인 사용 비활성화

@@ -27,7 +27,7 @@ public class JwtValidator {
 		return accessTokenWithBearer != null && accessTokenWithBearer.startsWith("Bearer ");
 	}
 
-	private Boolean isExpired(final String accessTokenWithBearer) {
+	public Boolean isExpired(final String accessTokenWithBearer) {
 		String token = accessTokenWithBearer.split(" ")[1];
 		return Jwts.parser()
 				.verifyWith(secretKey)
