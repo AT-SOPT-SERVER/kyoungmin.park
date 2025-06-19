@@ -14,8 +14,8 @@ public class ApiExceptionAdvice {
 		ExceptionMessage exceptionMessage = e.getExceptionMessage();
 
 		return ResponseEntity
-			.status(exceptionMessage.getHttpStatus())
-			.body(ErrorResponse.of(e.getExceptionMessage()));
+				.status(exceptionMessage.getHttpStatus())
+				.body(ErrorResponse.of(e.getExceptionMessage()));
 	}
 
 	// 정의되지 않은 예외에 대해 500을 반환
@@ -24,7 +24,7 @@ public class ApiExceptionAdvice {
 		ExceptionMessage exceptionMessage = ExceptionMessage.INTERNAL_SERVER_ERROR;
 
 		return ResponseEntity
-			.status(exceptionMessage.getHttpStatus())
-			.body(ErrorResponse.of(exceptionMessage));
+				.status(exceptionMessage.getHttpStatus())
+				.body(ErrorResponse.of(exceptionMessage));
 	}
 }
