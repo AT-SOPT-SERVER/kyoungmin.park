@@ -1,13 +1,18 @@
 package org.sopt.homework.global.api.advice;
 
+import org.sopt.homework.dto.user.response.TokenResponse;
 import org.sopt.homework.global.api.message.ResponseMessage;
 import org.sopt.homework.global.api.response.ErrorResponse;
 import org.sopt.homework.global.api.response.SuccessfulResponse;
+import org.sopt.homework.global.common.util.CookieUtil;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
@@ -21,16 +26,11 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
 
 	@Override
 	public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
-		Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request,
-		ServerHttpResponse response) {
+			Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request,
+			ServerHttpResponse response) {
 
-		// 예외처리된 응답에 대한 상태코드 설정 및 apiResponse wrapping 생략
-		if (body instanceof ErrorResponse errorResponse) {
-			return body;
-		}
-
-		// 이미 응답 형태로 감싸진 경우 바로 body를 반환
-		if (body instanceof SuccessfulResponse) {
+		// 예외처리된 응답이나 이미 응답 형태로 감싸진 경우에 대한 상태코드 설정 및 apiResponse wrapping 생략
+		if (body instanceof ErrorResponse || body instanceof SuccessfulResponse) {
 			return body;
 		}
 
@@ -38,6 +38,21 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
 		if (body instanceof ResponseMessage responseMessage) {
 			response.setStatusCode(responseMessage.getHttpStatus());
 			return SuccessfulResponse.of(responseMessage, null);
+		}
+
+		// 로그인 성공시 반환되는 토큰에 대한 응답 처리
+		if (body instanceof TokenResponse tokenResponse) {
+			response.setStatusCode(HttpStatus.OK);
+
+			// 헤더에 access토큰 추가
+			response.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer " + tokenResponse.accessToken());
+
+			// 쿠키에 refresh토큰 추가
+			((ServletServerHttpResponse)response).getServletResponse()
+					.addCookie(
+							CookieUtil.createCookie("Refresh", tokenResponse.refreshToken(), 7 * 24 * 60 * 60));
+
+			return SuccessfulResponse.of(ResponseMessage.LOGIN_SUCCESS, null);
 		}
 
 		return SuccessfulResponse.of(ResponseMessage.SUCCESS, body);
